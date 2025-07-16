@@ -81,4 +81,9 @@ def student_dashboard(request):
     if request.method == "GET":
         template = loader.get_template("core/student_dashboard.html")
         return HttpResponse(template.render({}, request))
+
+def org_dashboard(request):
+    return 
     
+def oaa_dashboard(request):
+    return 
