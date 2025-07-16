@@ -1,17 +1,81 @@
-<h1>Login</h1>
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li{% if messages.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-<form method="POST" action="#">
-    {% csrf_token %}
-    <label for="username">Username</label>
-    <input type="text" name="username">
-    <label for="password">Password</label>
-    <input type="password" name="password">
-    <input type="submit" value="Login">
-</form>
-<a href="/register">Don't have an account yet? Register Now!</a>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #1e1e1e;
+    }
+
+    .header {
+        color: #ccc;
+        font-size: 20px;
+        padding: 20px;
+        background-color: #1e1e1e;
+    }
+
+    .login-container {
+        background-color: #d7edf7;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-box {
+        background-color: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+    }
+
+    .logo {
+        margin-bottom: 20px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #086b94;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background-color: #055b7c;
+    }
+</style>
+
+<body>
+    <div class="header">Service Hour Tracker</div>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo">Scholar Login</div>
+                <form method="POST" action="#">
+                    {% csrf_token %}
+                    <label for="username">Username</label>
+                    <input type="text" name="username" required placeholder="ID Number">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" required>
+                    <button type="submit">Login</button>
+                </form>
+        </div>
+    </div>
+</body>
