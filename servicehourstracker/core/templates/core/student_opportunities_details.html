@@ -1,6 +1,10 @@
 <h1>Opportunity</h1>
 <a href="/student_dashboard">Dashboard</a>
 <a href="/student_opportunities">Opportunities</a>
+<a href="/student_calendar">Calendar</a>
+<br/>
+<br/>
+<div>
 {% if event %}
 <div>{{ event.name }}</div>
 <div>{{ event.organizer.name }}</div>
@@ -13,8 +17,10 @@
 {% if user_event_status %}
 <div>You already joined this event.</div>
 {% else %}
+</div>
 <form method="POST" action="#">
   {% csrf_token %}
   <input type="submit" value="Sign up" />
 </form>
+<br/>
 {% endif %} {% endif %}

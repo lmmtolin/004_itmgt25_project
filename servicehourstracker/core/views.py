@@ -5,7 +5,14 @@ from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import StudentProfile, OrgProfile, OAAProfile, Event, Participation
+from .models import (
+    StudentProfile,
+    OrgProfile,
+    OAAProfile,
+    Event,
+    Participation,
+    ClassScheduleForm,
+)
 from django.utils import timezone
 
 
@@ -83,13 +90,16 @@ def register_view(request):
 @login_required
 def student_dashboard(request):
     user = request.user
+
     try:
         student_profile = user.studentprofile
     except StudentProfile.DoesNotExist:
         student_profile = None
-        redirect("login_view")
+        return redirect("login_view")
+    volunteered_events = student_profile.events.all()
 
-    context = {"student": student_profile}
+    context = {"student": student_profile, "events": volunteered_events}
+    
     if request.method == "GET":
         template = loader.get_template("core/student_dashboard.html")
         return HttpResponse(template.render(context, request))
@@ -102,11 +112,38 @@ def student_opportunities(request):
         student_profile = user.studentprofile
     except StudentProfile.DoesNotExist:
         student_profile = None
-        redirect("login_view")
+        return redirect("login_view")
 
     now = timezone.now()
     events = Event.objects.filter(start_datetime__gt=now)
+
+    search_query = request.GET.get("search", "")
+    events = Event.objects.filter(start_datetime__gt=now)
+    if search_query:
+        events = events.filter(name__icontains=search_query)
+
     user_event_status = {}
+
+    filter_conflicts = request.GET.get("filter_conflicts") == "on"
+
+    if filter_conflicts:
+        student_classes = student_profile.class_schedules.all()
+        filtered_events = []
+        for event in events:
+            has_conflict = False
+            for schedule in student_classes:
+                if schedule.day_of_week == event.start_datetime.strftime("%A"):
+                    event_start = event.start_datetime.time()
+                    event_end = event.end_datetime.time()
+                    if (
+                        schedule.start_time < event_end
+                        and schedule.end_time > event_start
+                    ):
+                        has_conflict = True
+                        break
+            if not has_conflict:
+                filtered_events.append(event)
+        events = filtered_events
 
     for event in events:
         user_event_status[event.id] = event.is_user_in_event(user)
@@ -115,6 +152,8 @@ def student_opportunities(request):
         "student": student_profile,
         "events": events,
         "user_event_status": user_event_status,
+        "search_query": search_query,
+        "filter_conflicts": filter_conflicts,
     }
 
     if request.method == "GET":
@@ -130,7 +169,7 @@ def student_opportunities_details(request, event_id):
         student_profile = user.studentprofile
     except StudentProfile.DoesNotExist:
         student_profile = None
-        redirect("login_view")
+        return redirect("login_view")
 
     event = Event.objects.get(id=event_id)
     user_event_status = event.is_user_in_event(user)
@@ -148,6 +187,31 @@ def student_opportunities_details(request, event_id):
         participation = Participation(student=student_profile, event=event)
         participation.save()
         return redirect("student_opportunities")
+
+
+@login_required
+def student_calendar(request):
+    user = request.user
+    try:
+        student_profile = user.studentprofile
+    except StudentProfile.DoesNotExist:
+        student_profile = None
+        return redirect("login_view")
+
+    template = loader.get_template("core/student_calendar.html")
+    form = ClassScheduleForm()
+
+    if request.method == "POST":
+        form = ClassScheduleForm(request.POST)
+        if form.is_valid():
+            schedule = form.save(commit=False)
+            schedule.student = student_profile
+            schedule.save()
+            return redirect("student_calendar")
+
+    context = {"schedules": student_profile.class_schedules.all(), "form": form}
+    return HttpResponse(template.render(context, request))
+
 
 def org_dashboard(request):
     return

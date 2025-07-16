@@ -1,0 +1,48 @@
+<h1>Calendar</h1>
+<a href="/student_dashboard">Dashboard</a>
+<a href="/student_opportunities">Opportunities</a>
+<a href="/student_calendar">Calendar</a>
+<br />
+<br />
+<table>
+  <tr>
+    <th>Subject</th>
+    <th>Day</th>
+    <th>Start</th>
+    <th>End</th>
+  </tr>
+  {% for schedule in schedules %}
+  <tr>
+    <td>{{ schedule.subject }}</td>
+    <td>{{ schedule.day_of_week }}</td>
+    <td>{{ schedule.start_time }}</td>
+    <td>{{ schedule.end_time }}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="4">No class schedules yet.</td>
+  </tr>
+  {% endfor %}
+</table>
+<h2>Add Class Schedule</h2>
+<form method="post">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">Add Schedule</button>
+</form>
+<style>
+  table {
+    width: 50%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 12px; /* 👈 Increase this value for more space */
+    border: 1px solid #ccc; /* Optional: adds borders */
+    text-align: left;
+  }
+
+  th {
+    background-color: #f4f4f4;
+  }
+</style>
