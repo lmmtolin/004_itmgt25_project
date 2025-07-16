@@ -75,3 +75,10 @@ def register_view(request):
 
         messages.success(request, "Registration successful! Please log in.")
         return redirect("login_view")
+
+
+def student_dashboard(request):
+    if request.method == "GET":
+        template = loader.get_template("core/student_dashboard.html")
+        return HttpResponse(template.render({}, request))
+    
