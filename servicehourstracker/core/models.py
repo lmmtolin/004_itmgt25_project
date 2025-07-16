@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django import forms
 
 
 class StudentProfile(models.Model):
@@ -47,10 +48,42 @@ class Event(models.Model):
         except StudentProfile.DoesNotExist:
             return False
 
-        return Participation.objects.filter(student=student_profile, event=self).exists()
+        return Participation.objects.filter(
+            student=student_profile, event=self
+        ).exists()
 
 
 class Participation(models.Model):
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     attended = models.BooleanField(default=False)
+
+
+class ClassSchedule(models.Model):
+    student = models.ForeignKey(
+        "StudentProfile", on_delete=models.CASCADE, related_name="class_schedules"
+    )
+    day_of_week = models.CharField(
+        max_length=10,
+        choices=[
+            ("Monday", "Monday"),
+            ("Tuesday", "Tuesday"),
+            ("Wednesday", "Wednesday"),
+            ("Thursday", "Thursday"),
+            ("Friday", "Friday"),
+            ("Saturday", "Saturday"),
+            ("Sunday", "Sunday"),
+        ],
+    )
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    subject = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.subject} - {self.day_of_week} {self.start_time}-{self.end_time}"
+
+
+class ClassScheduleForm(forms.ModelForm):
+    class Meta:
+        model = ClassSchedule
+        fields = ["day_of_week", "start_time", "end_time", "subject"]

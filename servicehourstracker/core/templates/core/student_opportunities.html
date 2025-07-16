@@ -2,6 +2,18 @@
 <h1>Opportunities</h1>
 <a href="/student_dashboard">Dashboard</a>
 <a href="/student_opportunities">Opportunities</a>
+<a href="/student_calendar">Calendar</a>
+<br/>
+<br/>
+<form method="get" action="{% url 'student_opportunities' %}">
+    <input type="text" name="search" placeholder="Search events..." value="{{ request.GET.search }}">
+    <label>
+        <input type="checkbox" name="filter_conflicts" {% if filter_conflicts %}checked{% endif %}>
+        Only show events I’m available for
+    </label>
+    <button type="submit">Search</button>
+</form>
+<br/>
 {% if events %}
     {% for event in events %}
         <a href="student_opportunities_details/{{ event.id }}"><div>{{ event.name }}</div></a>
@@ -15,5 +27,7 @@
         {{ event.start_datetime }}
         {{ event.end_datetime }}
         {{ event.service_hours }}
+        <br/>
+        <br/>
     {% endfor %}
 {% endif %}
