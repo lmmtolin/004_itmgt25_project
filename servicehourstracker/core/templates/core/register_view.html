@@ -1,0 +1,37 @@
+<form method="POST">
+  {% csrf_token %}
+  <label for="username">Username</label>
+  <input type="text" name="username" required />
+  <label for="password">Password</label>
+  <input type="password" name="password" required />
+
+  <select name="user_type" required onchange="toggleFields(this.value)">
+    <option value="Student">Student</option>
+    <option value="Organization">Organization</option>
+  </select>
+  <br />
+  <br />
+  <br />
+  <div id="student-fields">
+    <label for="id_number">ID Number</label>
+    <input type="text" name="id_number" placeholder="ID Number" />
+  </div>
+
+  <div id="org-fields" style="display: none">
+    <label for="name">Name</label>
+    <input type="text" name="name" placeholder="Name" />
+  </div>
+
+  <button type="submit">Register</button>
+</form>
+<a href="/login">Login now</a>
+<script>
+  function toggleFields(type) {
+    document.getElementById("student-fields").style.display =
+      type === "Student" ? "block" : "none";
+    document.getElementById("org-fields").style.display =
+      type === "Organization" ? "block" : "none";
+    document.getElementById("oaa-fields").style.display =
+      type === "OAA" ? "block" : "none";
+  }
+</script>
