@@ -115,10 +115,9 @@ def student_opportunities(request):
         return redirect("login_view")
 
     now = timezone.now()
-    events = Event.objects.filter(start_datetime__gt=now)
 
     search_query = request.GET.get("search", "")
-    events = Event.objects.filter(start_datetime__gt=now)
+    events = Event.objects.filter(start_datetime__gt=now, approved=True)
     if search_query:
         events = events.filter(name__icontains=search_query)
 
