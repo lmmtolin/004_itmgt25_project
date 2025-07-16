@@ -1,1 +1,12 @@
 <h1>Student Dashboard</h1>
+<a href="/student_dashboard">Dashboard</a>
+<a href="/student_opportunities">Opportunities</a>
+<h2>Summary</h2>
+{% if student %}
+<div>
+  <label>Required Hours</label>
+  {{ student.required_service_hours }}
+</div>
+<div><label>Penalty Hours</label>{{ student.penalty_service_hours }}</div>
+<div><label>Completed Hours</label>{{ student.completed_service_hours }}</div>
+{% endif %}
