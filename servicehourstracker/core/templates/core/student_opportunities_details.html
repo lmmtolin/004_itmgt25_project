@@ -1,0 +1,20 @@
+<h1>Opportunity</h1>
+<a href="/student_dashboard">Dashboard</a>
+<a href="/student_opportunities">Opportunities</a>
+{% if event %}
+<div>{{ event.name }}</div>
+<div>{{ event.organizer.name }}</div>
+<div>{{ event.desciption}}</div>
+<div>{{ event.remaining_slots }}</div>
+<div>{{ event.start_datetime }}</div>
+<div>{{ event.end_datetime }}</div>
+<div>{{ event.service_hours }}</div>
+<div>{{ event.role_description }}</div>
+{% if user_event_status %}
+<div>You already joined this event.</div>
+{% else %}
+<form method="POST" action="#">
+  {% csrf_token %}
+  <input type="submit" value="Sign up" />
+</form>
+{% endif %} {% endif %}

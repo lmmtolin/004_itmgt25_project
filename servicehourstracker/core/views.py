@@ -5,7 +5,9 @@ from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
-from .models import StudentProfile, OrgProfile, OAAProfile
+from .models import StudentProfile, OrgProfile, OAAProfile, Event, Participation
+from django.utils import timezone
+
 
 def login_view(request):
     if request.method == "GET":
@@ -40,8 +42,9 @@ def login_view(request):
         elif actual_user_type == "OAA":
             return redirect("oaa_dashboard")
 
-        return redirect("index")
-    
+        return redirect("")
+
+
 def register_view(request):
     if request.method == "GET":
         template = loader.get_template("core/register_view.html")
@@ -69,7 +72,7 @@ def register_view(request):
                 user=user,
             )
         else:
-            user.delete() 
+            user.delete()
             messages.error(request, "Invalid user type.")
             return redirect(request.path_info)
 
@@ -77,13 +80,78 @@ def register_view(request):
         return redirect("login_view")
 
 
+@login_required
 def student_dashboard(request):
+    user = request.user
+    try:
+        student_profile = user.studentprofile
+    except StudentProfile.DoesNotExist:
+        student_profile = None
+        redirect("login_view")
+
+    context = {"student": student_profile}
     if request.method == "GET":
         template = loader.get_template("core/student_dashboard.html")
-        return HttpResponse(template.render({}, request))
+        return HttpResponse(template.render(context, request))
+
+
+@login_required
+def student_opportunities(request):
+    user = request.user
+    try:
+        student_profile = user.studentprofile
+    except StudentProfile.DoesNotExist:
+        student_profile = None
+        redirect("login_view")
+
+    now = timezone.now()
+    events = Event.objects.filter(start_datetime__gt=now)
+    user_event_status = {}
+
+    for event in events:
+        user_event_status[event.id] = event.is_user_in_event(user)
+
+    context = {
+        "student": student_profile,
+        "events": events,
+        "user_event_status": user_event_status,
+    }
+
+    if request.method == "GET":
+        template = loader.get_template("core/student_opportunities.html")
+        return HttpResponse(template.render(context, request))
+
+
+@login_required
+def student_opportunities_details(request, event_id):
+    user = request.user
+
+    try:
+        student_profile = user.studentprofile
+    except StudentProfile.DoesNotExist:
+        student_profile = None
+        redirect("login_view")
+
+    event = Event.objects.get(id=event_id)
+    user_event_status = event.is_user_in_event(user)
+
+    context = {
+        "student": student_profile,
+        "event": event,
+        "user_event_status": user_event_status,
+    }
+
+    if request.method == "GET":
+        template = loader.get_template("core/student_opportunities_details.html")
+        return HttpResponse(template.render(context, request))
+    elif request.method == "POST":
+        participation = Participation(student=student_profile, event=event)
+        participation.save()
+        return redirect("student_opportunities")
 
 def org_dashboard(request):
-    return 
-    
+    return
+
+
 def oaa_dashboard(request):
-    return 
+    return
