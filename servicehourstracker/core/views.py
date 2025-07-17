@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -15,6 +16,11 @@ from .models import (
     ClassSchedule,
 )
 from django.utils import timezone
+import qrcode
+from io import BytesIO
+import base64
+import json
+import ast
 
 
 def login_view(request):
@@ -33,7 +39,9 @@ def login_view(request):
             return redirect(request.path_info)
 
         actual_user_type = None
-        if hasattr(user, "studentprofile"):
+        if user.is_superuser:
+            actual_user_type = "Superuser"
+        elif hasattr(user, "studentprofile"):
             actual_user_type = "Student"
         elif hasattr(user, "orgprofile"):
             actual_user_type = "Organization"
@@ -49,6 +57,8 @@ def login_view(request):
             return redirect("org_dashboard")
         elif actual_user_type == "OAA":
             return redirect("oaa_dashboard")
+        elif actual_user_type == "Superuser":
+            return redirect("/admin/")
 
         return redirect("")
 
@@ -185,6 +195,7 @@ def student_opportunities(request):
 
 
 @login_required
+@csrf_exempt
 def student_opportunities_details(request, event_id):
     user = request.user
 
@@ -197,19 +208,35 @@ def student_opportunities_details(request, event_id):
     event = Event.objects.get(id=event_id)
     user_event_status = event.is_user_in_event(user)
 
+    data = {"event_id": event_id, "student_id": student_profile.id}
+    qr = qrcode.make(data)
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+
     context = {
         "student": student_profile,
         "event": event,
         "user_event_status": user_event_status,
+        "qr_code": img_str,
     }
-
     if request.method == "GET":
         template = loader.get_template("core/student_opportunities_details.html")
         return HttpResponse(template.render(context, request))
     elif request.method == "POST":
-        participation = Participation(student=student_profile, event=event)
-        participation.save()
-        return redirect("student_opportunities")
+        if user_event_status:
+            data = json.loads(request.body)
+            qr_data = ast.literal_eval(data.get("qr_data"))
+            event = Event.objects.get(id=qr_data["event_id"])
+            student = StudentProfile.objects.get(id=qr_data["student_id"])
+            participation = Participation.objects.get(student=student, event=event)
+            participation.attended = True
+            participation.save()
+            return redirect("/")
+        else:
+            participation = Participation(student=student_profile, event=event)
+            participation.save()
+            return redirect("student_opportunities")
 
 
 @login_required

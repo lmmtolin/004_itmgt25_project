@@ -58,6 +58,9 @@ class Participation(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     attended = models.BooleanField(default=False)
 
+    class Meta:
+        unique_together = ("student", "event")
+
 
 class ClassSchedule(models.Model):
     student = models.ForeignKey(
