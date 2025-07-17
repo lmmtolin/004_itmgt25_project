@@ -16,7 +16,7 @@
 <br/>
 {% if events %}
     {% for event in events %}
-        <a href="student_opportunities_details/{{ event.id }}"><div>{{ event.name }}</div></a>
+        <a href="/student_opportunities_details/{{ event.id }}"><div>{{ event.name }}</div></a>
         <div>{{ event.organizer.name }}</div>
         <div>{{ event.remaining_slots }}</div>
         {% if user_event_status|get_item:event.id %}

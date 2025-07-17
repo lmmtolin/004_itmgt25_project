@@ -10,6 +10,7 @@
     <th>Day</th>
     <th>Start</th>
     <th>End</th>
+    <th>Action</th>
   </tr>
   {% for schedule in schedules %}
   <tr>
@@ -17,6 +18,13 @@
     <td>{{ schedule.day_of_week }}</td>
     <td>{{ schedule.start_time }}</td>
     <td>{{ schedule.end_time }}</td>
+    <td>
+      <form method="post">
+        {% csrf_token %}
+        <input value="{{schedule.id}}" hidden name="to_delete_schedule_id" />
+        <button type="submit">Delete</button>
+      </form>
+    </td>
   </tr>
   {% empty %}
   <tr>

@@ -1,0 +1,59 @@
+<h1>Student Details</h1>
+<a href="/oaa_dashboard">Dashboard</a>
+<a href="/oaa_students">Students</a>
+<a href="/oaa_events">Events</a>
+{% if student %}
+<table>
+  <tr>
+    <th>Name</th>
+    <th>ID Number</th>
+    <th>Required</th>
+    <th>Penalty</th>
+    <th>Completed</th>
+    <th>Action</th>
+  </tr>
+  <tr>
+    <form method="POST" action="#">
+      {% csrf_token %}
+      <td>{{student.user.username}}</td>
+      <td>{{student.id_number}}</td>
+      <td>
+        <input
+          value="{{student.required_service_hours}}"
+          name="required_service_hours"
+        />
+      </td>
+      <td>
+        <input
+          value="{{student.penalty_service_hours}}"
+          name="penalty_service_hours"
+        />
+      </td>
+      <td>
+        <input
+          value="{{student.completed_service_hours}}"
+          name="completed_service_hours"
+        />
+      </td>
+      <td><button type="Submit">Update</button></td>
+    </form>
+  </tr>
+</table>
+{% endif %}
+<style>
+  table {
+    width: 50%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 12px; /* 👈 Increase this value for more space */
+    border: 1px solid #ccc; /* Optional: adds borders */
+    text-align: left;
+  }
+
+  th {
+    background-color: #f4f4f4;
+  }
+</style>

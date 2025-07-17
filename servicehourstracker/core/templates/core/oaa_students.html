@@ -1,0 +1,41 @@
+<h1>Students</h1>
+<a href="/oaa_dashboard">Dashboard</a>
+<a href="/oaa_students">Students</a>
+<a href="/oaa_events">Events</a>
+{% if students %}
+<table>
+  <tr>
+    <th>Name</th>
+    <th>ID Number</th>
+    <th>Required</th>
+    <th>Penalty</th>
+    <th>Completed</th>
+  </tr>
+  {% for student in students %}
+  <tr>
+    <td><a href="/oaa_students_detail/{{ student.id }}">{{student.user.username}}</a></td>
+    <td>{{student.id_number}}</td>
+    <td>{{student.required_service_hours}}</td>
+    <td>{{student.penalty_service_hours}}</td>
+    <td>{{student.completed_service_hours}}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+<style>
+  table {
+    width: 50%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 12px; /* 👈 Increase this value for more space */
+    border: 1px solid #ccc; /* Optional: adds borders */
+    text-align: left;
+  }
+
+  th {
+    background-color: #f4f4f4;
+  }
+</style>
