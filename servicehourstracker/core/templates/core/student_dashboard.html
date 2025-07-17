@@ -15,7 +15,6 @@
 <h2>Upcoming Events</h2>
 {% if events %}
   {% for event in events %}
-    {% for event in events %}
         <a href="student_opportunities_details/{{ event.id }}"><div>{{ event.name }}</div></a>
         <div>{{ event.organizer.name }}</div>
         <div>{{ event.remaining_slots }}</div>
@@ -24,6 +23,5 @@
         {{ event.service_hours }}
         <br/>
         <br/>
-    {% endfor %}
   {% endfor %}
 {% endif%}

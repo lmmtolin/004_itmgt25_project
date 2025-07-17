@@ -12,6 +12,7 @@ from .models import (
     Event,
     Participation,
     ClassScheduleForm,
+    ClassSchedule
 )
 from django.utils import timezone
 
@@ -99,7 +100,7 @@ def student_dashboard(request):
     volunteered_events = student_profile.events.all()
 
     context = {"student": student_profile, "events": volunteered_events}
-    
+
     if request.method == "GET":
         template = loader.get_template("core/student_dashboard.html")
         return HttpResponse(template.render(context, request))
@@ -201,14 +202,22 @@ def student_calendar(request):
     form = ClassScheduleForm()
 
     if request.method == "POST":
-        form = ClassScheduleForm(request.POST)
-        if form.is_valid():
-            schedule = form.save(commit=False)
-            schedule.student = student_profile
-            schedule.save()
+        if "to_delete_schedule_id" in request.POST:
+            schedule_id = request.POST.get("to_delete_schedule_id")
+            schedule = ClassSchedule.objects.filter(id=schedule_id, student=student_profile)
+            schedule.delete()
             return redirect("student_calendar")
-
-    context = {"schedules": student_profile.class_schedules.all(), "form": form}
+        else:    
+            form = ClassScheduleForm(request.POST)
+            if form.is_valid():
+                schedule = form.save(commit=False)
+                schedule.student = student_profile
+                schedule.save()
+                return redirect("student_calendar")
+    WEEKDAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    schedules = list(student_profile.class_schedules.all())
+    schedules.sort(key=lambda s: WEEKDAY_ORDER.index(s.day_of_week))
+    context = {"schedules": schedules, "form": form}
     return HttpResponse(template.render(context, request))
 
 
@@ -216,5 +225,100 @@ def org_dashboard(request):
     return
 
 
+@login_required
 def oaa_dashboard(request):
-    return
+    user = request.user
+    try:
+        oaa_profile = user.oaaprofile
+    except OAAProfile.DoesNotExist:
+        oaa_profile = None
+        return redirect("login_view")
+
+    template = loader.get_template("core/oaa_dashboard.html")
+    context = {}
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def oaa_students(request):
+    user = request.user
+    try:
+        oaa_profile = user.oaaprofile
+    except OAAProfile.DoesNotExist:
+        oaa_profile = None
+        return redirect("login_view")
+    students = StudentProfile.objects.all()
+    template = loader.get_template("core/oaa_students.html")
+    context = {"students": students}
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def oaa_students_detail(request, student_id):
+    user = request.user
+    try:
+        oaa_profile = user.oaaprofile
+    except OAAProfile.DoesNotExist:
+        oaa_profile = None
+        return redirect("login_view")
+    student = StudentProfile.objects.get(id=student_id)
+    template = loader.get_template("core/oaa_students_detail.html")
+
+    if request.method == "POST":
+        submitted_required_service_hours = request.POST["required_service_hours"]
+        submitted_penalty_service_hours = request.POST["penalty_service_hours"]
+        submitted_completed_service_hours = request.POST["completed_service_hours"]
+
+        student.required_service_hours = submitted_required_service_hours
+        student.penalty_service_hours = submitted_penalty_service_hours
+        student.completed_service_hours = submitted_completed_service_hours
+        student.save()
+
+        context = {"student": student}
+        return HttpResponse(template.render(context, request))
+    context = {"student": student}
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def oaa_events(request):
+    user = request.user
+    try:
+        oaa_profile = user.oaaprofile
+    except OAAProfile.DoesNotExist:
+        oaa_profile = None
+        return redirect("login_view")
+    template = loader.get_template("core/oaa_events.html")
+    events = Event.objects.all()
+
+    search_query = request.GET.get("search", "")
+    if search_query:
+        events = events.filter(name__icontains=search_query)
+
+    unapproved_only = request.GET.get("unapproved_only") == "on"
+    if unapproved_only:
+        events = events.filter(approved=False)
+
+    context = {"events": events, "unapproved_only": unapproved_only}
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def oaa_events_detail(request, event_id):
+    user = request.user
+    try:
+        oaa_profile = user.oaaprofile
+    except OAAProfile.DoesNotExist:
+        oaa_profile = None
+        return redirect("login_view")
+    template = loader.get_template("core/oaa_events_detail.html")
+    event = Event.objects.get(id=event_id)
+
+    if request.method == "POST":
+        event.approved = True
+        event.save()
+        context = {"event": event}
+        return HttpResponse(template.render(context, request))
+
+    context = {"event": event}
+    return HttpResponse(template.render(context, request))

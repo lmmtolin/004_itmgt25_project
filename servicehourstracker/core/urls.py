@@ -12,4 +12,8 @@ urlpatterns = [
     path("student_calendar", views.student_calendar, name="student_calendar"),
     path("org_dashboard", views.org_dashboard, name="org_dashboard"),
     path("oaa_dashboard", views.oaa_dashboard, name="oaa_dashboard"),
+    path("oaa_students", views.oaa_students, name="oaa_students"),
+    path("oaa_students_detail/<int:student_id>", views.oaa_students_detail, name="oaa_students_detail"),    
+    path("oaa_events", views.oaa_events, name="oaa_events"),
+    path("oaa_events_detail/<int:event_id>", views.oaa_events_detail, name="oaa_events_detail"),
 ]
