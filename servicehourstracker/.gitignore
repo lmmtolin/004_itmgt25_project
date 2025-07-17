@@ -1,0 +1,2 @@
+*.pyc
+servicehourstracker/db.sqlite3
