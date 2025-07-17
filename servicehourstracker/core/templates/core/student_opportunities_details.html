@@ -1,4 +1,24 @@
 <h1>Opportunity</h1>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<div id="reader" style="width: 300px;"></div>
+    <p>Scanned Result: <span id="qr-result"></span></p>
+
+    <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById("qr-result").innerText = "Complete!";
+
+            fetch('/student_opportunities_details/{{ event.id }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ qr_data: decodedText })
+            })
+        }
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+    </script>
 <a href="/student_dashboard">Dashboard</a>
 <a href="/student_opportunities">Opportunities</a>
 <a href="/student_calendar">Calendar</a>
@@ -16,6 +36,7 @@
 <div>{{ event.role_description }}</div>
 {% if user_event_status %}
 <div>You already joined this event.</div>
+<img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
 {% else %}
 </div>
 <form method="POST" action="#">
