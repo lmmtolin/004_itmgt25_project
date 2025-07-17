@@ -25,3 +25,31 @@
         <br/>
   {% endfor %}
 {% endif%}
+
+<h2>Attended Events</h2>
+{% if attended_events %}
+  {% for event in attended_events %}
+        <a href="student_opportunities_details/{{ event.id }}"><div>{{ event.name }}</div></a>
+        <div>{{ event.organizer.name }}</div>
+        <div>{{ event.remaining_slots }}</div>
+        {{ event.start_datetime }}
+        {{ event.end_datetime }}
+        {{ event.service_hours }}
+        <br/>
+        <br/>
+  {% endfor %}
+{% endif%}
+
+<h2>Missed Events</h2>
+{% if missed_events %}
+  {% for event in missed_events %}
+        <a href="student_opportunities_details/{{ event.id }}"><div>{{ event.name }}</div></a>
+        <div>{{ event.organizer.name }}</div>
+        <div>{{ event.remaining_slots }}</div>
+        {{ event.start_datetime }}
+        {{ event.end_datetime }}
+        {{ event.service_hours }}
+        <br/>
+        <br/>
+  {% endfor %}
+{% endif%}

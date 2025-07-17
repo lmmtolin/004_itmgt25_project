@@ -12,7 +12,7 @@ from .models import (
     Event,
     Participation,
     ClassScheduleForm,
-    ClassSchedule
+    ClassSchedule,
 )
 from django.utils import timezone
 
@@ -98,8 +98,31 @@ def student_dashboard(request):
         student_profile = None
         return redirect("login_view")
     volunteered_events = student_profile.events.all()
+    attended_events = Event.objects.filter(
+        participation__student=student_profile, participation__attended=True
+    )
+    missed_events = Event.objects.filter(
+        participation__student=student_profile,
+        participation__attended=False,
+        end_datetime__lt=timezone.now(),
+    )
+    completed_hours = 0
+    penalty_hours = 0
+    for event in attended_events:
+        completed_hours += event.service_hours
 
-    context = {"student": student_profile, "events": volunteered_events}
+    for event in missed_events:
+        penalty_hours += 2
+
+    student_profile.completed_service_hours = completed_hours
+    student_profile.penalty_service_hours = penalty_hours
+    student_profile.save()
+    context = {
+        "student": student_profile,
+        "events": volunteered_events,
+        "attended_events": attended_events,
+        "missed_events": missed_events,
+    }
 
     if request.method == "GET":
         template = loader.get_template("core/student_dashboard.html")
@@ -204,17 +227,27 @@ def student_calendar(request):
     if request.method == "POST":
         if "to_delete_schedule_id" in request.POST:
             schedule_id = request.POST.get("to_delete_schedule_id")
-            schedule = ClassSchedule.objects.filter(id=schedule_id, student=student_profile)
+            schedule = ClassSchedule.objects.filter(
+                id=schedule_id, student=student_profile
+            )
             schedule.delete()
             return redirect("student_calendar")
-        else:    
+        else:
             form = ClassScheduleForm(request.POST)
             if form.is_valid():
                 schedule = form.save(commit=False)
                 schedule.student = student_profile
                 schedule.save()
                 return redirect("student_calendar")
-    WEEKDAY_ORDER = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    WEEKDAY_ORDER = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ]
     schedules = list(student_profile.class_schedules.all())
     schedules.sort(key=lambda s: WEEKDAY_ORDER.index(s.day_of_week))
     context = {"schedules": schedules, "form": form}
