@@ -60,6 +60,12 @@
     <li><a href="/oaa_students">Students</a></li>
     <li><a href="/oaa_events">Events</a></li>
   </ul>
+  <div class="bottom-section">
+  <form action="{% url 'logout_view' %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Logout</button>
+  </form>
+  </div>
 </div>
 
 <div class="main-content">

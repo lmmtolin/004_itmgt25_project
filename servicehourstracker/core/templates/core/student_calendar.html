@@ -93,6 +93,12 @@
   <li><a href="/student_opportunities">Opportunities</a></li>
   <li><a href="/student_calendar">Calendar</a></li>
   </ul>
+  <div class="bottom-section">
+  <form action="{% url 'logout_view' %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Logout</button>
+  </form>
+  </div>
 </div>
 
 <body>
