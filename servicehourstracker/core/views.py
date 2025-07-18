@@ -22,6 +22,7 @@ import base64
 import json
 import ast
 from django.utils.dateparse import parse_datetime
+from django.http import JsonResponse
 
 
 def login_view(request):
@@ -63,9 +64,11 @@ def login_view(request):
 
         return redirect("")
 
+
 def logout_view(request):
     logout(request)
-    return redirect('login_view') 
+    return redirect("login_view")
+
 
 def register_view(request):
     if request.method == "GET":
@@ -219,9 +222,9 @@ def student_opportunities_details(request, event_id):
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
     img_str = base64.b64encode(buffer.getvalue()).decode()
-    
-    attended=False
-  
+
+    attended = False
+
     if user_event_status:
         participation = Participation.objects.get(student=student_profile, event=event)
         attended = participation.attended
@@ -231,15 +234,15 @@ def student_opportunities_details(request, event_id):
         "event": event,
         "user_event_status": user_event_status,
         "qr_code": img_str,
-        "attended": attended
+        "attended": attended,
     }
+    template = loader.get_template("core/student_opportunities_details.html")
     if request.method == "GET":
-        template = loader.get_template("core/student_opportunities_details.html")
         return HttpResponse(template.render(context, request))
     elif request.method == "POST":
         participation = Participation(student=student_profile, event=event)
         participation.save()
-        return redirect("student_opportunities")
+        return redirect("student_opportunities_details", event_id=event.id)
 
 
 @login_required
@@ -360,19 +363,32 @@ def org_scanner(request):
     try:
         org_profile = user.orgprofile
     except OrgProfile.DoesNotExist:
-        org_profile = None
         return redirect("login_view")
+
     template = loader.get_template("core/org_scanner.html")
-    context = {}
+    context = {"org_id": org_profile.id}
+
     if request.method == "POST":
         data = json.loads(request.body)
         qr_data = ast.literal_eval(data.get("qr_data"))
-        event = Event.objects.get(id=qr_data["event_id"])
-        student = StudentProfile.objects.get(id=qr_data["student_id"])
-        participation = Participation.objects.get(student=student, event=event)
-        participation.attended = True
-        participation.save()
-        return redirect("/")
+        event_id = qr_data.get("event_id")
+        student_id = qr_data.get("student_id")
+
+
+        event = Event.objects.filter(id=event_id, organizer=org_profile).first()
+        student = StudentProfile.objects.get(id=student_id)
+
+        if not event:
+            return JsonResponse({"error": "Unauthorized or invalid event"}, status=403)
+        try:
+            student = StudentProfile.objects.get(id=student_id)
+            participation = Participation.objects.get(student=student, event=event)
+            participation.attended = True
+            participation.save()
+            return JsonResponse({"success": f"Attendance marked for {student.user.username} for event {event.name}"})
+        except (StudentProfile.DoesNotExist, Participation.DoesNotExist):
+            return JsonResponse({"error": "Student not registered for this event"}, status=404)
+
     return HttpResponse(template.render(context, request))
 
 

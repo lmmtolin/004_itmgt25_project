@@ -116,10 +116,14 @@
 {% endif %}
 {% else %}
 </div>
+{% if not events.isfull %}
 <form method="POST" action="#">
   {% csrf_token %}
   <input type="submit" value="Sign up" />
 </form>
+{% else %}
+<div>Event is already full</div>
+{% endif %}
 <br/>
 {% endif %} {% endif %}
 </td>

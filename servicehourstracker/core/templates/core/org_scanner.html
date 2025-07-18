@@ -1,4 +1,3 @@
-
 <style>
   body {
     margin: 0;
@@ -60,50 +59,41 @@
     <li><a href="/org_scanner">Scanner</a></li>
   </ul>
   <div class="bottom-section">
-  <form action="{% url 'logout_view' %}" method="post">
-  {% csrf_token %}
-  <button type="submit">Logout</button>
-  </form>
+    <form action="{% url 'logout_view' %}" method="post">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
   </div>
 </div>
 
 <div class="main-content">
+  <h1>Scanner</h1>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <div id="reader" style="width: 300px"></div>
+  <p>Scanned Result: <span id="qr-result"></span></p>
 
-<h1>Scanner</h1>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<div id="reader" style="width: 300px"></div>
-<p>Scanned Result: <span id="qr-result"></span></p>
-
-<script>
-  function onScanSuccess(decodedText, decodedResult) {
-    try {
-      const cleanedText = decodedText.replace(/'/g, '"');
-
-      const qrData = JSON.parse(cleanedText);
-      const studentId = qrData.student_id;
-
-      document.getElementById(
-        "qr-result"
-      ).innerText = `Scan Complete of Student ID: ${studentId}`;
-
-      fetch("/org_scanner", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ qr_data: decodedText }),
-      });
-    } catch (error) {
-      document.getElementById("qr-result").innerText =
-        "Invalid QR code format!";
-      console.error("QR Code parsing failed:", error);
+  <script>
+    function onScanSuccess(decodedText, decodedResult) {
+      try {
+        fetch("/org_scanner", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ qr_data: decodedText }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            document.getElementById("qr-result").innerText =
+              data.success || data.error;
+          });
+      } catch (error) {
+        document.getElementById("qr-result").innerText = "Scanning Failed";
+      }
     }
-  }
 
-  let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
-    fps: 10,
-    qrbox: 250,
-  });
-  html5QrcodeScanner.render(onScanSuccess);
-</script>
+    let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+      fps: 10,
+      qrbox: 250,
+    });
+    html5QrcodeScanner.render(onScanSuccess);
+  </script>
 </div>

@@ -53,6 +53,9 @@ class Event(models.Model):
         return Participation.objects.filter(
             student=student_profile, event=self
         ).exists()
+    
+    def is_full(self):
+        return self.participation_set.count() >= self.number_of_students
 
 
 class Participation(models.Model):
