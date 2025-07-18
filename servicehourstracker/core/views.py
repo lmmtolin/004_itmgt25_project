@@ -125,15 +125,11 @@ def student_dashboard(request):
         participation__attended=False,
         end_datetime__lt=timezone.now(),
     )
-    completed_hours = 0
     penalty_hours = 0
-    for event in attended_events:
-        completed_hours += event.service_hours
 
     for event in missed_events:
         penalty_hours += 2
 
-    student_profile.completed_service_hours = completed_hours
     student_profile.penalty_service_hours = penalty_hours
     student_profile.save()
     context = {
@@ -384,6 +380,14 @@ def org_scanner(request):
             student = StudentProfile.objects.get(id=student_id)
             participation = Participation.objects.get(student=student, event=event)
             participation.attended = True
+            attended_events = Event.objects.filter(
+                participation__student=student, participation__attended=True
+                )
+            completed_hours = 0
+            for e in attended_events:
+                completed_hours += e.service_hours
+            student.completed_service_hours = completed_hours
+            student.save()
             participation.save()
             return JsonResponse({"success": f"Attendance marked for {student.user.username} for event {event.name}"})
         except (StudentProfile.DoesNotExist, Participation.DoesNotExist):
