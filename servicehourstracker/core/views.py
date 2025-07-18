@@ -21,6 +21,7 @@ from io import BytesIO
 import base64
 import json
 import ast
+from django.utils.dateparse import parse_datetime
 
 
 def login_view(request):
@@ -62,6 +63,9 @@ def login_view(request):
 
         return redirect("")
 
+def logout_view(request):
+    logout(request)
+    return redirect('login_view') 
 
 def register_view(request):
     if request.method == "GET":
@@ -215,30 +219,27 @@ def student_opportunities_details(request, event_id):
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
     img_str = base64.b64encode(buffer.getvalue()).decode()
+    
+    attended=False
+  
+    if user_event_status:
+        participation = Participation.objects.get(student=student_profile, event=event)
+        attended = participation.attended
 
     context = {
         "student": student_profile,
         "event": event,
         "user_event_status": user_event_status,
         "qr_code": img_str,
+        "attended": attended
     }
     if request.method == "GET":
         template = loader.get_template("core/student_opportunities_details.html")
         return HttpResponse(template.render(context, request))
     elif request.method == "POST":
-        if user_event_status:
-            data = json.loads(request.body)
-            qr_data = ast.literal_eval(data.get("qr_data"))
-            event = Event.objects.get(id=qr_data["event_id"])
-            student = StudentProfile.objects.get(id=qr_data["student_id"])
-            participation = Participation.objects.get(student=student, event=event)
-            participation.attended = True
-            participation.save()
-            return redirect("/")
-        else:
-            participation = Participation(student=student_profile, event=event)
-            participation.save()
-            return redirect("student_opportunities")
+        participation = Participation(student=student_profile, event=event)
+        participation.save()
+        return redirect("student_opportunities")
 
 
 @login_required
@@ -283,8 +284,96 @@ def student_calendar(request):
     return HttpResponse(template.render(context, request))
 
 
+@login_required
 def org_dashboard(request):
-    return
+    user = request.user
+    try:
+        org_profile = user.orgprofile
+    except OrgProfile.DoesNotExist:
+        org_profile = None
+        return redirect("login_view")
+    approved_events = org_profile.events.filter(approved=True)
+    unapproved_events = org_profile.events.filter(approved=False)
+    context = {
+        "approved_events": approved_events,
+        "unapproved_events": unapproved_events,
+    }
+    template = loader.get_template("core/org_dashboard.html")
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def org_eventsform(request):
+    user = request.user
+    try:
+        org_profile = user.orgprofile
+    except OrgProfile.DoesNotExist:
+        org_profile = None
+        return redirect("login_view")
+
+    context = {}
+    if request.method == "POST":
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+        location = request.POST.get("location")
+        service_hours = request.POST.get("service_hours")
+        number_of_students = request.POST.get("number_of_students")
+        role_descriptions = request.POST.get("role_descriptions")
+        start_datetime = request.POST.get("start_datetime")
+        end_datetime = request.POST.get("end_datetime")
+
+        event = Event.objects.create(
+            name=name,
+            description=description,
+            location=location,
+            service_hours=int(service_hours),
+            number_of_students=int(number_of_students),
+            role_descriptions=role_descriptions,
+            start_datetime=parse_datetime(start_datetime),
+            end_datetime=parse_datetime(end_datetime),
+            organizer=org_profile,
+            approved=False,
+        )
+        return redirect("org_dashboard")
+    template = loader.get_template("core/org_eventsform.html")
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+def org_events_detail(request, event_id):
+    user = request.user
+    try:
+        org_profile = user.orgprofile
+    except OrgProfile.DoesNotExist:
+        org_profile = None
+        return redirect("login_view")
+    event = Event.objects.get(id=event_id)
+    template = loader.get_template("core/org_events_detail.html")
+    context = {"event": event}
+    return HttpResponse(template.render(context, request))
+
+
+@login_required
+@csrf_exempt
+def org_scanner(request):
+    user = request.user
+    try:
+        org_profile = user.orgprofile
+    except OrgProfile.DoesNotExist:
+        org_profile = None
+        return redirect("login_view")
+    template = loader.get_template("core/org_scanner.html")
+    context = {}
+    if request.method == "POST":
+        data = json.loads(request.body)
+        qr_data = ast.literal_eval(data.get("qr_data"))
+        event = Event.objects.get(id=qr_data["event_id"])
+        student = StudentProfile.objects.get(id=qr_data["student_id"])
+        participation = Participation.objects.get(student=student, event=event)
+        participation.attended = True
+        participation.save()
+        return redirect("/")
+    return HttpResponse(template.render(context, request))
 
 
 @login_required
@@ -300,9 +389,9 @@ def oaa_dashboard(request):
     incomplete_students = 0
     for student in students:
         if student.remaining_service_hours() == 0:
-            completed_students+=1
+            completed_students += 1
         else:
-            incomplete_students+=1
+            incomplete_students += 1
 
     template = loader.get_template("core/oaa_dashboard.html")
     context = {

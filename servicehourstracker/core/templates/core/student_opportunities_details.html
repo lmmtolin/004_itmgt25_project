@@ -68,28 +68,6 @@
 <table style="width: 100%">
 <tr>
 <td>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<div id="reader" style="width: 300px;"></div>
-    <p>Scanned Result: <span id="qr-result"></span></p>
-
-    <script>
-        function onScanSuccess(decodedText, decodedResult) {
-            document.getElementById("qr-result").innerText = "Complete!";
-
-            fetch('/student_opportunities_details/{{ event.id }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ qr_data: decodedText })
-            })
-        }
-        let html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess);
-    </script>
-
-
 <div>
 {% if event %}
 
@@ -124,8 +102,12 @@
 <div>You already joined this event.</div>
 </td>
 <td>
+{% if attended %} 
+<h3>Already Attended</h3>
+{% else %}
 <h3>Your QR Code:</h3>
 <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+{% endif %}
 {% else %}
 </div>
 <form method="POST" action="#">

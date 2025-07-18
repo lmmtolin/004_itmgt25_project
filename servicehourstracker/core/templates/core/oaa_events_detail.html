@@ -16,115 +16,113 @@
   }
 
   body {
-  margin: 0;
-  font-family: Karla;
-  display: flex;
-}
+    margin: 0;
+    font-family: Karla;
+    display: flex;
+  }
 
-/* Sidebar styling */
-.sidebar {
-  width: 220px;
-  height: 100vh;
-  background-color: #1f2937;
-  color: #fff;
-  padding: 20px;
-  box-sizing: border-box;
-  position: fixed;
-}
+  /* Sidebar styling */
+  .sidebar {
+    width: 220px;
+    height: 100vh;
+    background-color: #1f2937;
+    color: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+  }
 
-.sidebar h2 {
-  margin-top: 0;
-  font-size: 24px;
-  margin-bottom: 20px;
-}
+  .sidebar h2 {
+    margin-top: 0;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
 
-.sidebar ul {
-  list-style-type: none;
-  padding: 0;
-}
+  .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
 
-.sidebar ul li {
-  margin: 15px 0;
-}
+  .sidebar ul li {
+    margin: 15px 0;
+  }
 
-.sidebar ul li a {
-  color: #cbd5e0;
-  text-decoration: none;
-  font-size: 16px;
-  display: block;
-  transition: 0.3s;
-}
+  .sidebar ul li a {
+    color: #cbd5e0;
+    text-decoration: none;
+    font-size: 16px;
+    display: block;
+    transition: 0.3s;
+  }
 
-.sidebar ul li a:hover {
-  color: #fff;
-}
+  .sidebar ul li a:hover {
+    color: #fff;
+  }
 
-.main-content {
-  margin-left: 220px;
-  padding: 30px;
-  flex-grow: 1;
-  background-color: #f9fafb;
-  height: 100vh;
-  box-sizing: border-box;
-  overflow-y: scroll;
-}
+  .main-content {
+    margin-left: 220px;
+    padding: 30px;
+    flex-grow: 1;
+    background-color: #f9fafb;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow-y: scroll;
+  }
 </style>
 <div class="sidebar">
-    <ul>
-        <li><a href="/oaa_dashboard">Dashboard</a></li>
-        <li><a href="/oaa_students">Students</a></li>
-        <li><a href="/oaa_events">Events</a></li>
-    </ul>
+  <ul>
+    <li><a href="/oaa_dashboard">Dashboard</a></li>
+    <li><a href="/oaa_students">Students</a></li>
+    <li><a href="/oaa_events">Events</a></li>
+  </ul>
 </div>
 
 <div class="main-content">
-<h1>{{ event.name }}</h1>
-<div>
-{% if event %}
-{% if event.approved %}
-<div>Event Approved</div>
-{% else %}
-</div>
-<form method="POST" action="#">
-  {% csrf_token %}
-  <input type="submit" value="Approve" />
-</form>
-<br/>
-{% endif %} {% endif %}
-<br>
-<table>
-  <tr>
-    <td>Event Name: </td>
-    <td>{{ event.name }}</td>
-  </tr>
-  <tr>
-    <td>Organizer: </td>
-    <td>{{ event.organizer.name }}</td>
-  </tr>
-  <tr>
-    <td>Description: </td>
-    <td>{{ event.desciption }}</td>
-  </tr>
-  <tr>
-    <td>Remaining Slots: </td>
-    <td>{{ event.remaining_slots }}</td>
-  </tr>
-  <tr>
-    <td>Start: </td>
-    <td>{{ event.start_datetime }}</td>
-  </tr>
-  <tr>
-    <td>End: </td>
-    <td>{{ event.end_datetime }}</td>
-  </tr>
-  <tr>
-    <td>Service Hours: </td>
-    <td>{{ event.service_hours }}</td>
-  </tr>
-  <tr>
-    <td>Tasks: </td>
-    <td>{{ event.role_description }}</td>
-  </tr>
-</table>
-
+  <h1>{{ event.name }}</h1>
+  <div>
+    {% if event %} {% if event.approved %}
+    <div>Event Approved</div>
+    {% else %}
+  </div>
+  <form method="POST" action="#">
+    {% csrf_token %}
+    <input type="submit" value="Approve" />
+  </form>
+  <br />
+  {% endif %} {% endif %}
+  <br />
+  <table>
+    <tr>
+      <td>Event Name:</td>
+      <td>{{ event.name }}</td>
+    </tr>
+    <tr>
+      <td>Organizer:</td>
+      <td>{{ event.organizer.name }}</td>
+    </tr>
+    <tr>
+      <td>Description:</td>
+      <td>{{ event.desciption }}</td>
+    </tr>
+    <tr>
+      <td>Remaining Slots:</td>
+      <td>{{ event.remaining_slots }}</td>
+    </tr>
+    <tr>
+      <td>Start:</td>
+      <td>{{ event.start_datetime }}</td>
+    </tr>
+    <tr>
+      <td>End:</td>
+      <td>{{ event.end_datetime }}</td>
+    </tr>
+    <tr>
+      <td>Service Hours:</td>
+      <td>{{ event.service_hours }}</td>
+    </tr>
+    <tr>
+      <td>Tasks:</td>
+      <td>{{ event.role_description }}</td>
+    </tr>
+  </table>
 </div>
