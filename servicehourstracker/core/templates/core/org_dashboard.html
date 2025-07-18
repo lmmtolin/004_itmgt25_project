@@ -1,11 +1,74 @@
-<h1>Dashboard</h1>
-<a href="/org_dashboard">Dashboard</a>
-<a href="/org_eventsform">Events Form</a>
-<a href="/org_scanner">Scanner</a>
-<form action="{% url 'logout_view' %}" method="post">
+
+<style>
+  body {
+    margin: 0;
+    font-family: Karla;
+    display: flex;
+  }
+  .sidebar {
+    width: 220px;
+    height: 100vh;
+    background-color: #1f2937;
+    color: #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    position: fixed;
+  }
+
+  .sidebar h2 {
+    margin-top: 0;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  .sidebar ul li {
+    margin: 15px 0;
+  }
+
+  .sidebar ul li a {
+    color: #cbd5e0;
+    text-decoration: none;
+    font-size: 16px;
+    display: block;
+    transition: 0.3s;
+  }
+
+  .sidebar ul li a:hover {
+    color: #fff;
+  }
+
+  .main-content {
+    margin-left: 220px;
+    padding: 30px;
+    flex-grow: 1;
+    background-color: #f9fafb;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow-y: scroll;
+  }
+</style>
+
+<div class="sidebar">
+  <ul>
+    <li><a href="/org_dashboard">Dashboard</a></li>
+    <li><a href="/org_eventsform">Events Form</a></li>
+    <li><a href="/org_scanner">Scanner</a></li>
+  </ul>
+  <div class="bottom-section">
+  <form action="{% url 'logout_view' %}" method="post">
   {% csrf_token %}
   <button type="submit">Logout</button>
-</form>
+  </form>
+  </div>
+</div>
+
+<div class="main-content">
+<h1>Dashboard</h1>
 <div>
   <h2>Approved Events</h2>
   {% for event in approved_events %}
@@ -17,4 +80,5 @@
   {% for event in unapproved_events %}
   <a href="/org_events_detail/{{event.id}}">{{event.name}} </a
   >{{event.startdatetime}}{% endfor %}
+</div>
 </div>
