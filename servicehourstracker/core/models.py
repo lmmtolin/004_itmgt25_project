@@ -10,7 +10,9 @@ class StudentProfile(models.Model):
     required_service_hours = models.FloatField(default=20.0)
     completed_service_hours = models.FloatField(default=0.0)
     penalty_service_hours = models.FloatField(default=0.0)
-
+    
+    def remaining_service_hours(self):
+        return max(0.0, (self.required_service_hours + self.penalty_service_hours) - self.completed_service_hours)
 
 class OrgProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

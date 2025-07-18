@@ -107,7 +107,9 @@ def student_dashboard(request):
     except StudentProfile.DoesNotExist:
         student_profile = None
         return redirect("login_view")
-    volunteered_events = student_profile.events.all()
+    volunteered_events = Event.objects.filter(
+        participation__student=student_profile, participation__attended=False
+    )
     attended_events = Event.objects.filter(
         participation__student=student_profile, participation__attended=True
     )
@@ -293,9 +295,20 @@ def oaa_dashboard(request):
     except OAAProfile.DoesNotExist:
         oaa_profile = None
         return redirect("login_view")
+    students = StudentProfile.objects.all()
+    completed_students = 0
+    incomplete_students = 0
+    for student in students:
+        if student.remaining_service_hours() == 0:
+            completed_students+=1
+        else:
+            incomplete_students+=1
 
     template = loader.get_template("core/oaa_dashboard.html")
-    context = {}
+    context = {
+        "completed_students": completed_students,
+        "incomplete_students": incomplete_students,
+    }
     return HttpResponse(template.render(context, request))
 
 
