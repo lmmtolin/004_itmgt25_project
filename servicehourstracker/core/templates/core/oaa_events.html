@@ -1,27 +1,141 @@
+<style>
+  body {
+  margin: 0;
+  font-family: Karla;
+  display: flex;
+}
+
+/* Sidebar styling */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background-color: #1f2937;
+  color: #fff;
+  padding: 20px;
+  box-sizing: border-box;
+  position: fixed;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin: 15px 0;
+}
+
+.sidebar ul li a {
+  color: #cbd5e0;
+  text-decoration: none;
+  font-size: 16px;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidebar ul li a:hover {
+  color: #fff;
+}
+
+.main-content {
+  margin-left: 220px;
+  padding: 30px;
+  flex-grow: 1;
+  background-color: #f9fafb;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow-y: scroll;
+}
+  .event_cell {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+}
+
+.event_cell #event-name{
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.per_event{
+  width: 100%;
+}
+.per_event td{
+  width: 200px;
+}
+
+input[type="text"]{
+    width: 60%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+button {
+        width: 100px;
+        padding: 12px;
+        background-color: #086b94;
+        border: none;
+        border-radius: 6px;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 10px;
+}
+</style>
+
+<div class="sidebar">
+    <ul>
+        <li><a href="/oaa_dashboard">Dashboard</a></li>
+        <li><a href="/oaa_students">Students</a></li>
+        <li><a href="/oaa_events">Events</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
 <h1>Events</h1>
-<a href="/oaa_dashboard">Dashboard</a>
-<a href="/oaa_students">Students</a>
-<a href="/oaa_events">Events</a>
 <br/>
 <br/>
 <form method="get" action="{% url 'oaa_events' %}">
     <input type="text" name="search" placeholder="Search events..." value="{{ request.GET.search }}">
+    <button type="submit">Search</button>
     <label>
         <input type="checkbox" name="unapproved_only" {% if unapproved_only %}checked{% endif %}>
         Show only unapproved events
     </label>
-    <button type="submit">Search</button>
 </form>
 <br/>
 {% if events %}
     {% for event in events %}
-        <a href="oaa_events_detail/{{ event.id }}"><div>{{ event.name }}</div></a>
-        <div>{{ event.organizer.name }}</div>
-        <div>{{ event.remaining_slots }}</div>
-        <div>{{ event.start_datetime }}</div> 
-        <div>{{ event.end_datetime }}</div> 
-        <div>{{ event.service_hours }}</div>
-        <br/>
-        <br/>
+    <div class="event_cell">
+          <table class="per_event">
+          <tr>
+          <td>
+          <a href="oaa_events_detail/{{ event.id }}"><div id="event-name">{{ event.name }}</div></a>
+          <br>
+          <div id="event-organizer">{{ event.organizer.name }}</div></td>
+          <td><div id="event-slots">Remaining Slots: <br>{{ event.remaining_slots }}</div></td>
+          <td><div id="event-time">
+            From: {{ event.start_datetime }}
+            <br>
+            To: {{ event.end_datetime }}
+
+          <td>Service Hours: <br>{{ event.service_hours }}</td>
+            </div>
+          </td>
+          </tr>
+          </table>
+          </div>
     {% endfor %}
 {% endif %}
+</div>
