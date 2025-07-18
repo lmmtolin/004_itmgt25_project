@@ -51,6 +51,26 @@
     box-sizing: border-box;
     overflow-y: scroll;
   }
+
+  .event_cell {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+}
+
+.event_cell #event-name{
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.per_event{
+  width: 100%;
+}
+.per_event td{
+  width: 200px;
+}
 </style>
 
 <div class="sidebar">
@@ -71,20 +91,49 @@
 <h1>Dashboard</h1>
 <div>
   <h2>Approved Events</h2>
-  <ul>
   {% for event in approved_events %}
-  <li>
-  <a href="/org_events_detail/{{event.id}}">{{event.name}} </a
-  >{{event.startdatetime}} {% endfor %}</li>
-  </ul>
+  <div class="event_cell">
+          <table class="per_event">
+          <tr>
+          <td>
+          <a href="/org_events_detail/{{event.id}}"><div id="event-name">{{ event.name }}</div></a>
+          <br>
+          <div id="event-organizer">{{ event.organizer.name }}</div></td>
+          <td><div id="event-slots">Remaining Slots: <br>{{ event.remaining_slots }}</div></td>
+          <td><div id="event-time">
+            From: {{ event.start_datetime }}
+            <br>
+            To: {{ event.end_datetime }}
+
+          <td>Service Hours: <br>{{ event.service_hours }}</td>
+            </div>
+          </td>
+          </tr>
+          </table>
+          </div> {% endfor %}
+  
 </div>
 <div>
   <h2>Unapproved Events</h2>
-  <ul>
-  <li>
   {% for event in unapproved_events %}
-  <a href="/org_events_detail/{{event.id}}">{{event.name}} </a
-  >{{event.startdatetime}}{% endfor %}</li>
-  </ul>
+  <div class="event_cell">
+          <table class="per_event">
+          <tr>
+          <td>
+          <a href="/org_events_detail/{{event.id}}"><div id="event-name">{{ event.name }}</div></a>
+          <br>
+          <div id="event-organizer">{{ event.organizer.name }}</div></td>
+          <td><div id="event-slots">Remaining Slots: <br>{{ event.remaining_slots }}</div></td>
+          <td><div id="event-time">
+            From: {{ event.start_datetime }}
+            <br>
+            To: {{ event.end_datetime }}
+
+          <td>Service Hours: <br>{{ event.service_hours }}</td>
+            </div>
+          </td>
+          </tr>
+          </table>
+          </div> {% endfor %}
 </div>
 </div>
