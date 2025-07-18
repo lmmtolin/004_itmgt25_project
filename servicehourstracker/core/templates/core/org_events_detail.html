@@ -1,0 +1,49 @@
+<h1>Event Details</h1>
+<a href="/org_dashboard">Dashboard</a>
+<a href="/org_eventsform">Events Form</a>
+<a href="/org_scanner">Scanner</a>
+<br/>
+<br/>
+<h1>Event: {{ event.name }}</h1>
+
+    <p><strong>Description:</strong> {{ event.description }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Service Hours:</strong> {{ event.service_hours }}</p>
+    <p><strong>Slots Available:</strong> {{ event.number_of_students }}</p>
+    <p><strong>Role Descriptions:</strong> {{ event.role_descriptions }}</p>
+    <p><strong>Start:</strong> {{ event.start_datetime }}</p>
+    <p><strong>End:</strong> {{ event.end_datetime }}</p>
+    <p><strong>Organizer:</strong> {{ event.organizer.name }}</p>
+    <p><strong>Status:</strong> 
+        {% if event.approved %}
+            Approved
+        {% else %}
+            Not Approved
+        {% endif %}
+    </p>
+
+    <h2>Volunteering Students</h2>
+    {% if event.participation_set.all %}
+        <table cellpadding="8">
+            <tr>
+                <th>Name</th>
+                <th>ID</th>
+                <th>Attendance</th>
+            </tr>
+            {% for participation in event.participation_set.all %}
+                <tr>
+                    <td>{{ participation.student.user.username }}</td>
+                    <td>{{ participation.student.id_number }}</td>
+                    <td>
+                        {% if participation.attended %}
+                            Attended
+                        {% else %}
+                            Not Attended
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No students have volunteered yet.</p>
+    {% endif %}

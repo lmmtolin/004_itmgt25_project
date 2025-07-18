@@ -1,0 +1,42 @@
+<h1>Scanner</h1>
+<a href="/org_dashboard">Dashboard</a>
+<a href="/org_eventsform">Events Form</a>
+<a href="/org_scanner">Scanner</a>
+<br />
+<br />
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<div id="reader" style="width: 300px"></div>
+<p>Scanned Result: <span id="qr-result"></span></p>
+
+<script>
+  function onScanSuccess(decodedText, decodedResult) {
+    try {
+      const cleanedText = decodedText.replace(/'/g, '"');
+
+      const qrData = JSON.parse(cleanedText);
+      const studentId = qrData.student_id;
+
+      document.getElementById(
+        "qr-result"
+      ).innerText = `Scan Complete of Student ID: ${studentId}`;
+
+      fetch("/org_scanner", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ qr_data: decodedText }),
+      });
+    } catch (error) {
+      document.getElementById("qr-result").innerText =
+        "Invalid QR code format!";
+      console.error("QR Code parsing failed:", error);
+    }
+  }
+
+  let html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+    fps: 10,
+    qrbox: 250,
+  });
+  html5QrcodeScanner.render(onScanSuccess);
+</script>

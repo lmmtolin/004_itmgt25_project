@@ -1,0 +1,20 @@
+<h1>Dashboard</h1>
+<a href="/org_dashboard">Dashboard</a>
+<a href="/org_eventsform">Events Form</a>
+<a href="/org_scanner">Scanner</a>
+<form action="{% url 'logout_view' %}" method="post">
+  {% csrf_token %}
+  <button type="submit">Logout</button>
+</form>
+<div>
+  <h2>Approved Events</h2>
+  {% for event in approved_events %}
+  <a href="/org_events_detail/{{event.id}}">{{event.name}} </a
+  >{{event.startdatetime}} {% endfor %}
+</div>
+<div>
+  <h2>Unapproved Events</h2>
+  {% for event in unapproved_events %}
+  <a href="/org_events_detail/{{event.id}}">{{event.name}} </a
+  >{{event.startdatetime}}{% endfor %}
+</div>

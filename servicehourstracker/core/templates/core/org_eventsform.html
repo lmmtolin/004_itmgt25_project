@@ -1,0 +1,35 @@
+<h1>Events Form</h1>
+<a href="/org_dashboard">Dashboard</a>
+<a href="/org_eventsform">Events Form</a>
+<a href="/org_scanner">Scanner</a>
+<br/>
+<br/>
+<form method="post" action="#">
+  {% csrf_token %}
+
+  <label for="name">Event Name:</label><br>
+  <input type="text" id="name" name="name" maxlength="100" required><br><br>
+
+  <label for="description">Description:</label><br>
+  <textarea id="description" name="description" rows="5" cols="50" required></textarea><br><br>
+
+  <label for="location">Location:</label><br>
+  <input type="text" id="location" name="location" maxlength="50" required><br><br>
+
+  <label for="service_hours">Service Hours:</label><br>
+  <input type="number" id="service_hours" name="service_hours" min="0" required><br><br>
+
+  <label for="number_of_students">Number of Students:</label><br>
+  <input type="number" id="number_of_students" name="number_of_students" min="1" required><br><br>
+
+  <label for="role_descriptions">Role Descriptions:</label><br>
+  <textarea id="role_descriptions" name="role_descriptions" rows="4" cols="50"></textarea><br><br>
+
+  <label for="start_datetime">Start Date & Time:</label><br>
+  <input type="datetime-local" id="start_datetime" name="start_datetime" required><br><br>
+
+  <label for="end_datetime">End Date & Time:</label><br>
+  <input type="datetime-local" id="end_datetime" name="end_datetime" required><br><br>
+
+  <button type="submit">Create Event</button>
+</form>
