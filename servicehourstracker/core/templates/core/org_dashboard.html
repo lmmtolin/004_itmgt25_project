@@ -71,14 +71,20 @@
 <h1>Dashboard</h1>
 <div>
   <h2>Approved Events</h2>
+  <ul>
   {% for event in approved_events %}
+  <li>
   <a href="/org_events_detail/{{event.id}}">{{event.name}} </a
-  >{{event.startdatetime}} {% endfor %}
+  >{{event.startdatetime}} {% endfor %}</li>
+  </ul>
 </div>
 <div>
   <h2>Unapproved Events</h2>
+  <ul>
+  <li>
   {% for event in unapproved_events %}
   <a href="/org_events_detail/{{event.id}}">{{event.name}} </a
-  >{{event.startdatetime}}{% endfor %}
+  >{{event.startdatetime}}{% endfor %}</li>
+  </ul>
 </div>
 </div>

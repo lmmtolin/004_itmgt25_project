@@ -51,6 +51,28 @@
     box-sizing: border-box;
     overflow-y: scroll;
   }
+
+    table {
+    width: 50%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 12px; /* 👈 Increase this value for more space */
+    border: 1px solid #ccc; /* Optional: adds borders */
+    text-align: left;
+  }
+
+  th {
+    background-color: #f4f4f4;
+  }
+
+  body {
+    margin: 0;
+    font-family: Karla;
+    display: flex;
+  }
 </style>
 
 <div class="sidebar">
@@ -70,22 +92,48 @@
 <div class="main-content">
 <h1>Event Details</h1>
 <h1>Event: {{ event.name }}</h1>
-
-    <p><strong>Description:</strong> {{ event.description }}</p>
-    <p><strong>Location:</strong> {{ event.location }}</p>
-    <p><strong>Service Hours:</strong> {{ event.service_hours }}</p>
-    <p><strong>Slots Available:</strong> {{ event.number_of_students }}</p>
-    <p><strong>Role Descriptions:</strong> {{ event.role_descriptions }}</p>
-    <p><strong>Start:</strong> {{ event.start_datetime }}</p>
-    <p><strong>End:</strong> {{ event.end_datetime }}</p>
-    <p><strong>Organizer:</strong> {{ event.organizer.name }}</p>
-    <p><strong>Status:</strong> 
-        {% if event.approved %}
+<table>
+    <tr>
+        <td><strong>Description:</strong></td>
+        <td>{{ event.description }}</td>
+    </tr>
+    <tr>
+        <td><strong>Location:</strong></td>
+        <td>{{ event.location }}</td>
+    </tr>
+    <tr>
+        <td><strong>Service Hours:</strong></td>
+        <td>{{ event.service_hours }}</td>
+    </tr>
+    <tr>
+        <td><strong>Slots Available:</strong></td>
+        <td>{{ event.number_of_students }}</td>
+    </tr>
+    <tr>
+        <td><strong>Role Descriptions:</strong></td>
+        <td>{{ event.role_descriptions }}</td>
+    </tr>
+    <tr>
+        <td><strong>Start:</strong></td>
+        <td>{{ event.start_datetime }}</td>
+    </tr>
+    <tr>
+        <td><strong>End:</strong></td>
+        <td>{{ event.end_datetime }}</td>
+    </tr>
+    <tr>
+        <td><strong>Organizer:</strong></td>
+        <td>{{ event.organizer.name }}</td>
+    </tr>
+    <tr>
+        <td><strong>Status:</strong> </td>
+        <td>{% if event.approved %}
             Approved
         {% else %}
             Not Approved
-        {% endif %}
-    </p>
+        {% endif %}</td>
+    </tr>
+</table>
 
     <h2>Volunteering Students</h2>
     {% if event.participation_set.all %}
