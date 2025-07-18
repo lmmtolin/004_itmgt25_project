@@ -125,13 +125,7 @@ def student_dashboard(request):
         participation__attended=False,
         end_datetime__lt=timezone.now(),
     )
-    penalty_hours = 0
 
-    for event in missed_events:
-        penalty_hours += 2
-
-    student_profile.penalty_service_hours = penalty_hours
-    student_profile.save()
     context = {
         "student": student_profile,
         "events": volunteered_events,
